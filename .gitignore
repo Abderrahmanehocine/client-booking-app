@@ -24,5 +24,4 @@ dist-ssr
 *.sw?
 
 # not finished yet
-README.md
 backend/
