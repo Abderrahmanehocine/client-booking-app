@@ -1,12 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-const Header = ({ isAdminLoggedIn, onLogout }) => {
+const Header = ({ isAdminLoggedIn, onLogout, businessName }) => {
   return (
     <header className="bg-blue-600 text-white p-4">
       <div className="container mx-auto flex justify-between items-center">
         <h1 className="text-2xl font-bold">
-          <Link to={isAdminLoggedIn ? "/admin" : "/"}>Client Booking App</Link>
+          <Link to={isAdminLoggedIn ? "/admin" : "/"}>{businessName || 'Client Booking App'}</Link>
         </h1>
         <nav>
           <ul className="flex space-x-4">
@@ -17,7 +17,7 @@ const Header = ({ isAdminLoggedIn, onLogout }) => {
             )}
             <li>
               <Link
-                to={isAdminLoggedIn ? "/admin" : "/client/bookings"}
+                to={isAdminLoggedIn ? "/admin/bookings" : "/client/bookings"}
                 className="hover:underline"
               >
                 {isAdminLoggedIn ? "Bookings" : "My Bookings"}

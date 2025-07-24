@@ -5,12 +5,18 @@ import Footer from './layout/Footer.jsx';
 import ClientHome from './pages/ClientHome.jsx';
 import ClientBookings from './pages/ClientBookings.jsx';
 import AdminDashboard from './pages/AdminDashboard.jsx';
+import AdminBookings from './pages/AdminBookings.jsx';
 import AdminLogin from './components/AdminLogin.jsx';
+import AdminRegister from './components/AdminRegister.jsx';
 
 const App = () => {
   const [availableSlots, setAvailableSlots] = useState([]);
   const [bookings, setBookings] = useState([]);
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
+  const [adminAccounts, setAdminAccounts] = useState([
+    { businessName: 'Default Business', email: 'admin@example.com', password: 'admin123' }, // Initial admin account
+  ]);
+  const [currentBusinessName, setCurrentBusinessName] = useState(''); // Track logged-in business name
 
   const handleBook = (slotId, clientInfo) => {
     setAvailableSlots(
@@ -30,22 +36,35 @@ const App = () => {
     setBookings(bookings.filter((booking) => booking.id !== slotId));
   };
 
-  const handleAdminLogin = (password) => {
-    if (password === 'admin123') {
+  const handleAdminLogin = (businessName, email, password) => {
+    const admin = adminAccounts.find(
+      (account) => account.businessName === businessName && account.email === email && account.password === password
+    );
+    if (admin) {
       setIsAdminLoggedIn(true);
+      setCurrentBusinessName(admin.businessName); // Store business name for header
       return true;
     }
     return false;
   };
 
+  const handleAdminRegister = (businessName, email, password) => {
+    if (adminAccounts.some((account) => account.businessName === businessName || account.email === email)) {
+      return false; // Business name or email exists
+    }
+    setAdminAccounts([...adminAccounts, { businessName, email, password }]);
+    return true;
+  };
+
   const handleAdminLogout = () => {
     setIsAdminLoggedIn(false);
+    setCurrentBusinessName(''); // Clear business name on logout
   };
 
   return (
     <Router>
       <div className="flex flex-col min-h-screen bg-gray-100">
-        <Header isAdminLoggedIn={isAdminLoggedIn} onLogout={handleAdminLogout} />
+        <Header isAdminLoggedIn={isAdminLoggedIn} onLogout={handleAdminLogout} businessName={currentBusinessName} />
         <main className="flex-grow">
           <Routes>
             <Route
@@ -69,7 +88,18 @@ const App = () => {
                 )
               }
             />
+            <Route
+              path="/admin/bookings"
+              element={
+                isAdminLoggedIn ? (
+                  <AdminBookings bookings={bookings} onCancel={handleCancel} />
+                ) : (
+                  <Navigate to="/admin/login" />
+                )
+              }
+            />
             <Route path="/admin/login" element={<AdminLogin onLogin={handleAdminLogin} />} />
+            <Route path="/admin/register" element={<AdminRegister onRegister={handleAdminRegister} />} />
             <Route path="*" element={<Navigate to={isAdminLoggedIn ? "/admin" : "/"} />} />
           </Routes>
         </main>

@@ -1,17 +1,18 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 
-const AdminLogin = ({ onLogin }) => {
+const AdminRegister = ({ onRegister }) => {
   const [businessName, setBusinessName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
     setError('');
-    if (!businessName || !email || !password) {
+    if (!businessName || !email || !password || !confirmPassword) {
       setError('All fields are required');
       return;
     }
@@ -19,18 +20,22 @@ const AdminLogin = ({ onLogin }) => {
       setError('Invalid email format');
       return;
     }
-    const success = onLogin(businessName, email, password);
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+    const success = onRegister(businessName, email, password);
     if (success) {
-      navigate('/admin');
+      navigate('/admin/login');
     } else {
-      setError('Invalid business name, email, or password');
+      setError('Business name or email already exists');
     }
   };
 
   return (
     <div className="container mx-auto p-4 flex justify-center items-center min-h-screen">
       <div className="w-full max-w-md bg-white shadow-md rounded-lg p-6">
-        <h2 className="text-2xl font-semibold text-gray-700 mb-6 text-center">Admin Login</h2>
+        <h2 className="text-2xl font-semibold text-gray-700 mb-6 text-center">Admin Registration</h2>
         {error && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-md mb-4">
             {error}
@@ -67,16 +72,26 @@ const AdminLogin = ({ onLogin }) => {
               placeholder="Enter password"
             />
           </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Confirm Password</label>
+            <input
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+              placeholder="Confirm password"
+            />
+          </div>
           <button
             onClick={handleSubmit}
             className="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600"
           >
-            Login
+            Register
           </button>
           <p className="text-center text-gray-600">
-            Don't have an account?{' '}
-            <Link to="/admin/register" className="text-blue-500 hover:underline">
-              Register
+            Already have an account?{' '}
+            <Link to="/admin/login" className="text-blue-500 hover:underline">
+              Login
             </Link>
           </p>
         </div>
@@ -85,4 +100,4 @@ const AdminLogin = ({ onLogin }) => {
   );
 };
 
-export default AdminLogin;
+export default AdminRegister;
